@@ -18,8 +18,14 @@ import androidx.annotation.Keep
 import com.google.firebase.FirebaseApp
 import com.google.firebase.components.Component
 import com.google.firebase.components.ComponentRegistrar
-import com.google.firebase.firestore.*
-import com.google.firebase.firestore.util.Logger
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldPath
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QueryDocumentSnapshot
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.platforminfo.LibraryVersionComponent
@@ -170,7 +176,7 @@ fun DocumentReference.toFlow() = callbackFlow {
         if (value != null && value.exists()) {
             offer(value)
         } else if (error != null) {
-            Logger.warn("DocumentReference:flow", error.message)
+            close(error)
         }
     }
     awaitClose {
@@ -186,7 +192,7 @@ fun Query.toFlow() = callbackFlow {
         if (value != null) {
             offer(value)
         } else if (error != null) {
-            Logger.warn("Query:flow", error.message)
+            close(error)
         }
     }
     awaitClose {
