@@ -26,6 +26,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.MetadataChanges
 
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.platforminfo.LibraryVersionComponent
@@ -170,9 +171,10 @@ class FirebaseFirestoreKtxRegistrar : ComponentRegistrar {
 
 /**
  * Attach a snapshotListener to a DocumentReference and use it as a coroutine flow
+ * @param metadataChanges Indicates whether metadata-only changes
  */
-fun DocumentReference.toFlow() = callbackFlow {
-    val listener = addSnapshotListener { value, error ->
+fun DocumentReference.toFlow(metadataChanges: MetadataChanges = MetadataChanges.EXCLUDE) = callbackFlow {
+    val listener = addSnapshotListener(metadataChanges) { value, error ->
         if (value != null && value.exists()) {
             offer(value)
         } else if (error != null) {
@@ -186,9 +188,10 @@ fun DocumentReference.toFlow() = callbackFlow {
 
 /**
  * Attach a snapshotListener to a Query and use it as a coroutine flow
+ * @param metadataChanges Indicates whether metadata-only changes
  */
-fun Query.toFlow() = callbackFlow {
-    val listener = addSnapshotListener { value, error ->
+fun Query.toFlow(metadataChanges: MetadataChanges = MetadataChanges.EXCLUDE) = callbackFlow {
+    val listener = addSnapshotListener(metadataChanges) { value, error ->
         if (value != null) {
             offer(value)
         } else if (error != null) {
